@@ -1,16 +1,111 @@
 <section role="group" aria-label="Basic example">
   <div class=" button-ctn-time d-flex w-100 justify-content-around">
-    <button [ngClass]="{'btn-active' : toggleBreak, 'btn-inactive': !toggleBreak}" (click)="showMenu('Desayuno')" class="btn start w-30"> DESAYUNO </button>
-    <button  [ngClass]="{'btn-active' : toggleDay, 'btn-inactive': !toggleDay}" (click)="showMenu('Resto del día')" class="btn start w-30"> RESTO DEL DÍA </button>
+    <button [ngClass]="{'btn-active' : toggleBreak, 'btn-inactive': !toggleBreak}" (click)="showMenu('Desayuno')"
+      class="btn start w-30"> DESAYUNO </button>
+    <button [ngClass]="{'btn-active' : toggleDay, 'btn-inactive': !toggleDay}" (click)="showMenu('Resto del día')"
+      class="btn start w-30"> RESTO DEL DÍA </button>
   </div>
   <section class="d-flex flex-wrap justify-content-around align-items-stretch menu-ctn">
-    <div class="d-flex btn-menu-ctn bg-success" *ngFor="let menu of menus">
-      <button (click)="getOrder(menu.data)" type="button " class=" btn-menu btn">
+    <div *ngFor="let menu of menus" class="d-flex btn-menu-ctn bg-success">
+      <button *ngIf="!menu.data.contenido" (click)="getOrder(menu.data)" type="button " class=" btn-menu btn">
         <span>{{menu.data.nombre}}</span> <br>
         <span>${{menu.data.precio}}</span>
       </button>
+      <button *ngIf="menu.data.contenido" type="button" class=" btn-menu btn" (click)="open(content, menu.data)">
+          <span>{{menu.data.nombre}}</span> <br>
+        </button>
+
+      <ng-template #content let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title" id="modal-basic-title"> {{burgerName}} {{burgerType}} {{burgerAdit}} - ${{burgerPrice + burgerPriceAdit}} </h4>
+          <button type="button" class="close" aria-label="Close" (click)="getInitialValues()"(click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form class="d-flex flex-column">
+
+              <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="model">
+                  <label ngbButtonLabel class="btn-outline-warning">
+                    <input (click)="changeContent(menu.data.contenido.uno)" ngbButton type="radio" [value]="1" name="{{menu.data.contenido.uno.nombre}}" >{{menu.data.contenido.uno.nombre}} 
+                    <p> ${{menu.data.contenido.uno.precio}} </p>
+                  </label> 
+                  <label ngbButtonLabel class="btn-outline-warning">
+                    <input (click)="changeContent(menu.data.contenido.dos)" ngbButton type="radio" [value]="false" name="{{menu.data.contenido.dos.nombre}}" >
+                    {{menu.data.contenido.dos.nombre}}                 
+                     <p> ${{menu.data.contenido.dos.precio}} </p>
+                  </label>
+                </div>
+                
+
+            <div *ngIf="menu.data.adicional" class="btn-group btn-group-toggle">
+              <label class="btn-outline-warning" ngbButtonLabel>
+                <input (click)="addAdit(menu.data.adicional.uno, valueOne)" type="checkbox" ngbButton [(ngModel)]="valueOne" name="valueOne">+ {{menu.data.adicional.uno.nombre}} ${{menu.data.adicional.uno.precio}}
+              </label>
+        
+              <label class="btn-outline-warning" ngbButtonLabel>
+                <input (click)="addAdit(menu.data.adicional.dos, valueTwo)" type="checkbox" ngbButton [(ngModel)]="valueTwo" name="valueTwo">+ {{menu.data.adicional.dos.nombre}} ${{menu.data.adicional.uno.precio}}
+              </label>
+            </div>
+
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button (click)="getOrder(menu.data)" type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>
+        </div>
+      </ng-template>
     </div>
+
   </section>
 </section>
 
 <!-- menu-container d-flex align-content-stretch flex-wrap [ngStyle]="toggle ? 'btn-active' : 'btn-inactive'"-->
+<!-- <section class="d-flex flex-wrap justify-content-around align-items-stretch menu-ctn">
+    <div *ngFor="let menu of menus" *ngIf="menu.data.contenido; then burgerButton else otherButton" class="d-flex btn-menu-ctn bg-success">
+      <div>
+      <button #otherButton (click)="getOrder(menu.data)" type="button " class=" btn-menu btn">
+        <span>{{menu.data.nombre}}</span> <br>
+        <span>${{menu.data.precio}}</span>
+      </button>
+      <button #burgerButton type="button " class=" btn-menu btn" (click)="open(content)">
+          <span>{{menu.data.nombre}}</span> <br>
+          <span>${{menu.data.precio}}</span>
+        </button>
+
+      
+
+    </div>
+    </div>
+  </section>
+-->
+
+
+<!-- <section role="group" aria-label="Basic example">
+  <div class=" button-ctn-time d-flex w-100 justify-content-around">
+    <button [ngClass]="{'btn-active' : toggleBreak, 'btn-inactive': !toggleBreak}" (click)="showMenu('Desayuno')"
+      class="btn start w-30"> DESAYUNO </button>
+    <button [ngClass]="{'btn-active' : toggleDay, 'btn-inactive': !toggleDay}" (click)="showMenu('Resto del día')"
+      class="btn start w-30"> RESTO DEL DÍA </button>
+  </div>
+  <section class="d-flex flex-wrap justify-content-around align-items-stretch menu-ctn">
+    <div class="d-flex btn-menu-ctn bg-success" *ngFor="let menu of menus">
+      <button (click)="getOrder(menu.data)" type="button " class=" btn-menu btn" data-toggle="modal"
+        data-target="#myModal">
+        <span>{{menu.data.nombre}}</span> <br>
+        <span>${{menu.data.precio}}</span>
+      </button>
+
+      <div *ngIf="menu.data.contenido">
+        <input type="radio" name="{{menu.data.id}}" value="{{menu.data.contenido[0]}}">{{menu.data.contenido[0]}}<br>
+        <input type="radio" name="{{menu.data.id}}" value="{{menu.data.contenido[1]}}">
+        {{menu.data.contenido[1]}}<br>
+      </div>
+      <div *ngIf="menu.data.adicional">
+        <input type="checkbox" value="menu.data.adicional[0]">{{menu.data.adicional[0]}}<br>
+        <input type="checkbox" value="menu.data.adicional[1]"> {{menu.data.adicional[1]}}<br>
+      </div>
+    </div>
+
+  </section>
+</section> -->

@@ -88,16 +88,24 @@ export class DataService {
     this.totalSource.next(this.total);
    }
 
-  agregarProd(producto) {
+  agregarProd(producto, burgerName, burgerPrice,firstLett) {
+    const productList = Object.assign({}, producto);
+    if (productList.contenido) {
+      productList.nombre = burgerName;
+      productList.precio = burgerPrice; 
+      productList.id += `${firstLett}${burgerPrice}`;
+    }
+  
     const arrId = this.orderProductos.map(prod =>
       prod.id);
-    if (arrId.includes(producto.id)) {
-      const elemento = this.orderProductos.find(p => producto.id === p.id)
+    if (arrId.includes(productList.id)) {
+      const elemento = this.orderProductos.find(p => productList.id === p.id)
       elemento.quantity += 1; 
     } else {
-      this.orderProductos.push(producto);
-      producto.quantity += 1;
+      this.orderProductos.push(productList);
+      productList.quantity += 1;
     }
+
     this.orderSource.next(this.orderProductos);
   }
 
