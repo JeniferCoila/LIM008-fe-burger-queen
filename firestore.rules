@@ -3,7 +3,9 @@ service cloud.firestore {
     match /orders/{id} {
       allow read, write: if true;
     }
-
+        match /menu/{id} {
+      allow read, write: if true;
+    }
     match /{document=**} {
       allow read, write: if false;
     }
